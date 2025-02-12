@@ -17,7 +17,7 @@ function Showcase() {
             </div>
             <img
               class="img-fluid w-50 d-none d-sm-block"
-              src="./img/news.svg"
+              src="/img/newsletter.svg"
               alt=""
             />
           </div>
@@ -27,7 +27,7 @@ function Showcase() {
         <div class="container">
           <div class="row align-items-center justify-content-between">
             <div class="col-md">
-              <img src="img/newsletter.svg" class="img-fluid" alt="" />
+              <img src="/img/posts.svg" class="img-fluid" alt="" />
             </div>
             <div class="col-md p-5">
               <h2>Learn The Fundamentals</h2>
