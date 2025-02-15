@@ -28,7 +28,7 @@ function NavbarMenu() {
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="#questions" class="nav-link">
+                  <a href="#" class="nav-link"> 
                     Questions
                   </a>
                 </li>

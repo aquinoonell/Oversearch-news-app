@@ -7,20 +7,20 @@ import RowGrid from "./component/rows";
 import Showcase from "./component/showcase";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <body>
-      <div>
-        <NavbarMenu />
-      </div>
-      <div>
-        <Showcase />
-      </div>
-      <div>
-        <div>
-          <RowGrid />
-        </div>
-        <NewsLetter />
-      </div>
-    </body>
-  </StrictMode>,
+    <StrictMode>
+        <body>
+            <div>
+                <NavbarMenu />
+            </div>
+            <div>
+                <Showcase />
+            </div>
+            <div>
+                <RowGrid />
+            </div>
+            <div>
+                <NewsLetter />
+            </div>
+        </body>
+    </StrictMode>,
 );
