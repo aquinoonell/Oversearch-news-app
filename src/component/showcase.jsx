@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "bootstrap";
+import CatFact from "./cats";
 
 function Showcase() {
     return (

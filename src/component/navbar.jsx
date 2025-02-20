@@ -4,7 +4,6 @@ import "bootstrap";
 function NavbarMenu() {
   return (
     <>
-      <body>
         <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-3 fixed-top">
           <div class="container">
             <a href="#" class="navbar-brand">
@@ -41,7 +40,6 @@ function NavbarMenu() {
             </div>
           </div>
         </nav>
-      </body>
     </>
   );
 }
