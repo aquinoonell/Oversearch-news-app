@@ -1,29 +1,66 @@
 import { useState } from "react";
+import axios from "axios"; 
 import "bootstrap";
 
-function NewsLetter() {
-    return (
-        <>
-            <section class="bg-primary text-light p-3">
-                <div class="container">
-                    <div class="d-md-flex justify-content-between align-items-center">
-                        <h3 class="mb-3 mb-md-0"><span class="text-dark">Sign Up </span> For Our Newsletter</h3>
+const NewsletterForm = () => {
+    const [email, setEmail] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
 
-                        <div class="input-group news-input">
+    const handleSubmit = async (e) => {
+        e.preventDefault();  // Prevents the default form behavior (page reload)
+        setLoading(true);
+        setMessage("");
+
+        try {
+            // Send POST request to the backend
+            const response = await axios.post("http://localhost:5100/api/subs", { email });
+
+            if (response.data.success) {
+                setMessage("Successfully subscribed!");
+            } else {
+                setMessage(response.data.error || "Something went wrong.");
+            }
+        } catch (error) {
+            setMessage("An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <section className="bg-primary text-light p-3">
+            <div className="container">
+                <div className="d-md-flex justify-content-between align-items-center">
+                    <h3 className="mb-3 mb-md-0">
+                        <span className="text-dark">Sign Up </span> For Our Newsletter
+                    </h3>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="input-group news-input">
                             <input
-                                type="text"
-                                class="form-control"
-                                placeholder="Enter Email"
+                                type="email"
+                                className="form-control"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
                             />
-                            <button class="btn btn-dark btn-lg" type="button">
-                                Submit
+                            <button
+                                className="btn btn-dark btn-lg btn-expand-sm"
+                                type="submit"
+                                disabled={loading}
+                            >
+                                {loading ? "Subscribing..." : "Submit"}
                             </button>
                         </div>
-                    </div>
+                    </form>
+                            {message && <div className="alert alert-info">{message}</div>}
                 </div>
-            </section>
-        </>
+            </div>
+        </section>
     );
-}
+};
 
-export default NewsLetter;
+export default NewsletterForm;
+

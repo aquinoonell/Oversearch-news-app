@@ -28,7 +28,7 @@ const CatFact = () => {
     };
 
     return (
-        <div className="container mt-4 py-2" >
+        <div className="container mt-4 py-2">
             <div className="card bg-dark text-light">
                 <div className="card-body text-center">
                     <h5 className="card-title">Cat Fact</h5>
@@ -36,19 +36,16 @@ const CatFact = () => {
                         {isLoading ? (
                             <div className="alert alert-info" role="alert">
                                 Loading...
-                            </div> 
+                            </div>
                         ) : error ? (
                             <div className="alert alert-danger" role="alert">
-                                    {error}
+                                {error}
                             </div>
                         ) : (
-                            <p>{fact}</p> 
+                            <p>{fact}</p>
                         )}
 
-                        <button
-                            className="btn btn-primary mt-3"
-                            onClick={fetchCatFact}
-                        >
+                        <button className="btn btn-primary mt-3" onClick={fetchCatFact}>
                             Get New Fact
                         </button>
                     </section>
@@ -59,4 +56,3 @@ const CatFact = () => {
 };
 
 export default CatFact;
-
