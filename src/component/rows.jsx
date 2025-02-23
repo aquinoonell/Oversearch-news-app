@@ -10,12 +10,13 @@ function RowGrid() {
             <div class="col-md">
               <div class="card bg-dark text-light">
                 <div class="card-body text-center">
-                  <div class="h1 mb-3">
-                  </div>
-                  <h3 class="card-title mb-3" href=" ">First</h3>
-                  <p class="card-text">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure, quas quidem possimus dolorum esse eligendi?
+                  <div class="h1 mb-3"></div>
+                  <h3 class="card-title mb-3" href=" ">
+                    Who Am I?
+                  </h3>
+                  <p class="col-md">
+                    My name is Onell, I'm an aspiring Software Engineer. This
+                    project is to showcase my skills as a full stack developer.
                   </p>
                 </div>
               </div>
@@ -23,12 +24,13 @@ function RowGrid() {
             <div class="col-md">
               <div class="card bg-dark text-light">
                 <div class="card-body text-center">
-                  <div class="h1 mb-3">
-                  </div>
-                  <h3 class="card-title mb-3">Second</h3>
+                  <div class="h1 mb-3"></div>
+                  <h3 class="card-title mb-3">Why a News Website?</h3>
                   <p class="card-text">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure, quas quidem possimus dolorum esse eligendi?
+                    I wanted to do something I was passionate about, I love
+                    reading about News and I wanted to provide you with
+                    something that could reflect that, hopefully you can get to
+                    enjoy reading and news as much as me.
                   </p>
                 </div>
               </div>
@@ -36,12 +38,13 @@ function RowGrid() {
             <div class="col-md">
               <div class="card bg-dark text-light">
                 <div class="card-body text-center">
-                  <div class="h1 mb-3">
-                  </div>
-                  <h3 class="card-title mb-3">Third</h3>
+                  <div class="h1 mb-3"></div>
+                  <h3 class="card-title mb-3">Cat Facts?</h3>
                   <p class="card-text">
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Iure, quas quidem possimus dolorum esse eligendi?
+                    Well you probably confused about the Cat Facts section, it's
+                    not a secret I'm a cat lover and I just wanted to integrate
+                    something fun and insightful, to make sure not only you get
+                    to learn about policial news but also about cats.
                   </p>
                 </div>
               </div>

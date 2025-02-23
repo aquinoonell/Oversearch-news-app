@@ -14,7 +14,7 @@ const NewsletterForm = () => {
 
         try {
             // Send POST request to the backend
-            const response = await axios.post("http://localhost:5100/api/subs", { email });
+            const response = await axios.post("http://localhost:5200/api/subs", { email });
 
             if (response.data.success) {
                 setMessage("Successfully subscribed!");
