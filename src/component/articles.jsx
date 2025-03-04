@@ -1,27 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const ArticleFetcher = () => {
   const [loading, setLoading] = useState(false);
-  const [article, setArticle] = useState(null);
+  const [articles, setArticles] = useState([]);
   const [error, setError] = useState(null);
-  const [articleUrl, setArticleUrl] = useState(""); // Store URL input
+  const [page, setPage] = useState(1);
 
-  const fetchArticle = async () => {
+  const fetchNews = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.get("http://localhost:5100/fetch-article", {
-        params: { url: articleUrl }, // Send the article URL as a query parameter
-      });
-      setArticle(response.data.article); // Assuming the server returns the article in this structure
+      const response = await axios.get(
+        "http://localhost:5100/fetch-headlines",
+        {
+          params: {
+            country: "us",
+            categories: "general",
+            page,
+            limit: 5,
+          },
+        },
+      );
+
+      console.log(response.data.data);
+      console.log(response);
+      console.log(response.status);
+
+      setArticles((prevArticles) => [...prevArticles, ...response.data.data]);
     } catch (err) {
       console.log(err.response || err);
-      setError("Failed to fetch the article.");
+      setError("Failed to fetch the news.");
     } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, [page]); // Re-Fetch whenever the page changes
+
+  const loadMore = () => {
+    setPage((prevPage) => prevPage + 1);
   };
 
   return (
@@ -31,36 +52,56 @@ const ArticleFetcher = () => {
           <div className="col-md">
             <div className="card bg-dark text-light">
               <div className="card-body text-center">
-                <h3 className="card-title mb-3">Article</h3>
+                <h3 className="card-title mb-3">Top Headlines</h3>
 
-                <input
-                  type="text"
-                  value={articleUrl}
-                  onChange={(e) => setArticleUrl(e.target.value)}
-                  placeholder="Enter article URL"
-                  className="form-control mb-3"
-                />
+                {error && <div className="alert alert-danger">{error}</div>}
 
-                {error && (
-                  <Alert variant="danger" className="mt-3">
-                    {error}
-                  </Alert>
-                )}
                 <button
-                  onClick={fetchArticle}
+                  onClick={fetchNews}
                   className="btn btn-primary btn-lg btn-expand-sm"
-                  type="submit"
-                  disabled={loading || !articleUrl}
+                  type="button"
+                  disabled={loading}
                 >
-                  {loading ? "Subscribing..." : "Submit"}
+                  {loading ? "Loading..." : "Fetch Headlines"}
                 </button>
-                {article && (
-                  <div
-                    className="card-text mt-3"
-                    style={{ maxHeight: "300px", overflowY: "auto" }}
-                  >
-                    {article}
+                {articles?.length > 0 && (
+                  <div className="mt-4">
+                    <h5 className="mb-3">Latest News</h5>
+                    <ul className="list-unstyled">
+                      {articles.map((article, index) => (
+                        <li key={index} className="mb-3">
+                          <h6>
+                            <a
+                              href={article.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {article.title}
+                            </a>
+                          </h6>
+                          <p>{article.description}</p>
+                          {/* Display image if available */}
+                          {article.image_url && (
+                            <img
+                              src={article.image_url}
+                              alt={article.title}
+                              style={{ maxWidth: "100%", height: "auto" }}
+                            />
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={loadMore}
+                      className="btn btn-secondary"
+                      disabled={loading}
+                    >
+                      {loading ? "Loading More..." : "Load More"}
+                    </button>
                   </div>
+                )}
+                {articles?.length === 0 && !loading && (
+                  <div className="alert alert-info">No articles found.</div>
                 )}
               </div>
             </div>
