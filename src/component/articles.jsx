@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 const ArticleFetcher = () => {
@@ -6,8 +6,10 @@ const ArticleFetcher = () => {
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 20;
 
-  const fetchNews = async () => {
+  const fetchNews = async (page = 1) => {
     setLoading(true);
     setError(null);
 
@@ -18,17 +20,20 @@ const ArticleFetcher = () => {
           params: {
             country: "us",
             categories: "general",
-            page,
-            limit: 5,
+            page: page,
+            pageSize: pageSize,
           },
         },
       );
 
-      console.log(response.data.data);
-      console.log(response);
-      console.log(response.status);
+      setArticles((prevArticles) => [
+        ...prevArticles,
+        ...response.data.articles,
+      ]);
 
-      setArticles((prevArticles) => [...prevArticles, ...response.data.data]);
+      if (response.data.totalResults) {
+        setTotalPages(Math.ceil(response.data.totalResults / pageSize));
+      }
     } catch (err) {
       console.log(err.response || err);
       setError("Failed to fetch the news.");
@@ -37,12 +42,12 @@ const ArticleFetcher = () => {
     }
   };
 
-  useEffect(() => {
-    fetchNews();
-  }, [page]); // Re-Fetch whenever the page changes
-
   const loadMore = () => {
-    setPage((prevPage) => prevPage + 1);
+    if (page < totalPages) {
+      const newPage = page + 1;
+      setPage(newPage);
+      fetchNews(newPage);
+    }
   };
 
   return (
@@ -70,24 +75,36 @@ const ArticleFetcher = () => {
                     <ul className="list-unstyled">
                       {articles.map((article, index) => (
                         <li key={index} className="mb-3">
-                          <h6>
-                            <a
-                              href={article.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                          <div className="row g-0 bg-body-muted position-relative">
+                            {/* Image Section */}
+                            {article.urlToImage && (
+                              <div className="col-md-6 mb-md-0 p-md-4">
+                                <img
+                                  src={article.urlToImage}
+                                  className="w-75"
+                                  alt={article.title}
+                                  style={{ objectFit: "cover", height: "auto" }}
+                                />
+                              </div>
+                            )}
+
+                            {/* Text Section */}
+                            <div
+                              className={`col-md-6 p-4 ps-md-0 ${article.urlToImage ? "" : "text-center"}`}
                             >
-                              {article.title}
-                            </a>
-                          </h6>
-                          <p>{article.description}</p>
-                          {/* Display image if available */}
-                          {article.image_url && (
-                            <img
-                              src={article.image_url}
-                              alt={article.title}
-                              style={{ maxWidth: "100%", height: "auto" }}
-                            />
-                          )}
+                              <h5 className="mt-0">
+                                <a
+                                  href={article.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="stretched-link"
+                                >
+                                  {article.title}
+                                </a>
+                              </h5>
+                              <p className="text-light">{article.description}</p>
+                            </div>
+                          </div>
                         </li>
                       ))}
                     </ul>
@@ -100,7 +117,7 @@ const ArticleFetcher = () => {
                     </button>
                   </div>
                 )}
-                {articles?.length === 0 && !loading && (
+                {articles?.length === 1 && !loading && (
                   <div className="alert alert-info">No articles found.</div>
                 )}
               </div>
