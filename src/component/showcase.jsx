@@ -1,102 +1,127 @@
-import { useState } from "react";
-import "bootstrap";
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function Showcase() {
+function Showcase({ isDarkMode }) {
+  const [featuredArticles, setFeaturedArticles] = useState([]);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+
+  const fetchFeaturedArticles = useCallback(async () => {
+    try {
+      const response = await axios.get("http://localhost:5100/fetch-articles", {
+        params: {
+          page: 1,
+          pageSize: 10
+        }
+      });
+
+      const articles = response.data.articles.filter(article => 
+        article.urlToImage && article.description
+      );
+
+      setFeaturedArticles(articles);
+      
+      if (articles.length > 0) {
+        setSelectedArticle(articles[0]);
+      }
+    } catch (error) {
+      console.error("Error fetching featured articles:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFeaturedArticles();
+  }, [fetchFeaturedArticles]);
+
+  const handleArticleSelect = (article) => {
+    setSelectedArticle(article);
+  };
+
   return (
-    <>
-      <section className="bg-dark text-light p-5 p-lg-0 pt-lg-5 text-center text-sm-start">
-        <div className="container">
-          <div className="d-sm-flex align-items-center justify-content-between">
-            <div>
-              <h2>
-                Become a <span className="text-primary">Polical Head</span>
-              </h2>
-              <p className="lead my-4">
-                If you don't know, who Hasan is. Don't worry, is never too late.
-                This website is going to be designed to help you navigate
-                political views, in a fun matter.
-              </p>
+    <div className={`container mt-5 pt-5 ${isDarkMode ? 'bg-dark text-light' : ''}`}>
+      <div className="row g-5">
+        <div className="col-md-8">
+          {selectedArticle && (
+            <div className={`p-4 p-md-5 mb-4 rounded ${isDarkMode ? 'bg-secondary text-light' : 'text-body-emphasis bg-body-secondary'}`}>
+              <div className="row">
+                <div className="col-lg-6 px-0">
+                  <h1 className={`display-4 ${isDarkMode ? 'text-light' : 'fst-italic'}`}>
+                    {selectedArticle.title}
+                  </h1>
+                  <p className={`lead my-3 ${isDarkMode ? 'text-light-50' : ''}`}>
+                    {selectedArticle.description}
+                  </p>
+                  <div className={`mb-3 ${isDarkMode ? 'text-light-50' : 'text-body-secondary'}`}>
+                    Published on {new Date(selectedArticle.publishedAt).toLocaleDateString()}
+                    {selectedArticle.author && ` by ${selectedArticle.author}`}
+                  </div>
+                  <a 
+                    href={selectedArticle.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className={`btn ${isDarkMode ? 'btn-outline-light' : 'btn-primary'}`}
+                  >
+                    Continue reading
+                  </a>
+                </div>
+                <div className="col-lg-6">
+                  <img 
+                    src={selectedArticle.urlToImage} 
+                    alt={selectedArticle.title} 
+                    className="img-fluid rounded"
+                    style={{
+                      width: '100%', 
+                      height: '250px', 
+                      objectFit: 'cover'
+                    }}
+                    onError={(e) => {
+                      e.target.src = `https://via.placeholder.com/400x250.png?text=Dev.to+Article`;
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-            <img
-              className="img-fluid w-50 d-none py-5 d-sm-block img-sm-start"
-              src="/img/learning.svg"
-              alt=""
-            />
+          )}
+        </div>
+
+        <div className="col-md-4">
+          <div className="position-sticky" style={{top: '2rem'}}>
+            <div className={`p-4 mb-3 ${isDarkMode ? 'bg-secondary text-light' : 'bg-body-tertiary'}`}>
+              <h4 className={`fst-italic ${isDarkMode ? 'text-light' : ''}`}>
+                Recent Dev.to Articles
+              </h4>
+              {featuredArticles.slice(1, 5).map((article, index) => (
+                <div 
+                  key={index} 
+                  className={`mb-3 border-bottom pb-3 ${selectedArticle === article ? (isDarkMode ? 'bg-dark' : 'bg-light') : ''}`}
+                  onClick={() => handleArticleSelect(article)}
+                  style={{cursor: 'pointer'}}
+                >
+                  <div className="row g-0 overflow-hidden flex-md-row position-relative">
+                    <div className="col p-4 d-flex flex-column position-static">
+                      <strong className={`d-inline-block mb-2 ${isDarkMode ? 'text-primary-50' : 'text-primary'}`}>
+                        {article.source.name}
+                      </strong>
+                      <h6 className={`mb-0 ${isDarkMode ? 'text-light' : ''}`}>
+                        {article.title}
+                      </h6>
+                      <div className={`mb-1 ${isDarkMode ? 'text-light-50' : 'text-body-secondary'}`}>
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                      </div>
+                      <p className={`card-text mb-auto ${isDarkMode ? 'text-light-50' : 'text-muted small'}`}>
+                        {article.description.length > 100 
+                          ? article.description.substring(0, 100) + '...' 
+                          : article.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
-      <section id="learn" className="p-5">
-        <div className="container">
-          <div className="row align-items-center justify-content-between">
-            <div className="col-md">
-              <img src="/img/options.svg" className="img-fluid" alt="" />
-            </div>
-            <div className="col-md p-5">
-              <h2>Learn The Fundamentals</h2>
-              <p className="lead">
-                Let's talk about the Political Parties :
-                <br />
-                <br />
-                <li>
-                  <span className="text-primary">The Democrats</span> - They’re
-                  all about using government power to help people and make
-                  society fairer. Their focus is on things like healthcare for
-                  all, environmental protections, and social equality.
-                </li>
-                <li>
-                  <span className="text-danger">The Republicans</span> - They
-                  believe in a more limited role for government, lower taxes,
-                  and that people should be able to take care of themselves
-                  without a lot of government intervention. They focus on
-                  personal freedom and responsibility, with an emphasis on a
-                  free-market economy.
-                </li>
-              </p>
-              <p className="lead">
-                At this point you should already know which way you're leaning
-                towards, you can't choose wrong, just don't follow a party
-                because your dad said so, to summarize everything you read
-                here's a simple description.
-                <br />
-                <br />
-                <li>
-                  <span className="text-primary">Democrats</span>: More focused
-                  on community, equity, and using government power for social
-                  good.
-                </li>
-                <li>
-                  <span className="text-danger">Republicans</span>: More focused
-                  on personal freedom, limited government, and preserving
-                  traditional values.
-                </li>
-                <br />
-                The fun comes from the drama and constant back-and-forth between
-                these two teams, each trying to push the country in their own
-                direction. It’s like a political tug-of-war where they both
-                think they’re making the best play for the future! We are using
-                colors to help you distinguish the parties.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section id="" className="p-5">
-        <div className="container">
-          <div className="col-md p-5">
-            <h2>How to use?</h2>
-            <p className="lead">
-              This is a brief explanation on how to use the website!
-            </p>
-            <li>
-              Copy any url you'll like to read into the Article search box.
-            </li>
-            <li>Once you have copied the url, and click the submit button.</li>
-            <li>Enjoy the articel without any adds or distracting images.</li>
-            <p className="lead"></p>
-          </div>
-        </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }
 

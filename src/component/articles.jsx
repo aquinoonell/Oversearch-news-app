@@ -1,132 +1,161 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const ArticleFetcher = () => {
+const ArticleFetcher = ({ 
+  excludedArticles = [], 
+  onDisplayedArticlesChange,
+  isDarkMode 
+}) => {
   const [loading, setLoading] = useState(false);
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 20;
+  const [totalResults, setTotalResults] = useState(0);
+  const pageSize = 10;
 
-  const fetchNews = async (page = 1) => {
+  useEffect(() => {
+    fetchArticles(1);
+  }, []);
+
+  useEffect(() => {
+    if (onDisplayedArticlesChange) {
+      onDisplayedArticlesChange(articles);
+    }
+  }, [articles, onDisplayedArticlesChange]);
+
+  const fetchArticles = async (pageToFetch) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await axios.get(
-        "http://localhost:5100/fetch-headlines",
-        {
-          params: {
-            country: "us",
-            categories: "general",
-            page: page,
-            pageSize: pageSize,
-          },
+      const uniqueUrls = new Set(articles.map(a => a.url));
+
+      const response = await axios.get("http://localhost:5100/fetch-articles", {
+        params: {
+          page: pageToFetch,
+          pageSize: pageSize,
         },
+      });
+
+      if (!response.data || !response.data.articles) {
+        throw new Error("Invalid API response structure");
+      }
+
+      const newArticles = response.data.articles.filter(article => 
+        !uniqueUrls.has(article.url) && 
+        !excludedArticles.some(excluded => excluded.url === article.url)
       );
 
-      setArticles((prevArticles) => [
-        ...prevArticles,
-        ...response.data.articles,
-      ]);
+      const combinedArticles = pageToFetch === 1 
+        ? newArticles 
+        : [...articles, ...newArticles];
 
-      if (response.data.totalResults) {
-        setTotalPages(Math.ceil(response.data.totalResults / pageSize));
-      }
+      setArticles(combinedArticles);
+      setPage(pageToFetch);
+      
+      setTotalResults(response.data.totalResults);
+
     } catch (err) {
-      console.log(err.response || err);
-      setError("Failed to fetch the news.");
+      console.error("Error fetching articles:", err);
+      setError("Unable to fetch news at the moment");
     } finally {
       setLoading(false);
     }
   };
 
   const loadMore = () => {
-    if (page < totalPages) {
-      const newPage = page + 1;
-      setPage(newPage);
-      fetchNews(newPage);
-    }
+    const nextPage = page + 1;
+    fetchArticles(nextPage);
   };
 
+  const hasMoreArticles = articles.length < totalResults;
+
   return (
-    <section className="p-2">
-      <div className="container">
-        <div className="row text-center g-4">
-          <div className="col-md">
-            <div className="card bg-dark text-light">
-              <div className="card-body text-center">
-                <h3 className="card-title mb-3">Top Headlines</h3>
+    <div className={`container py-5 ${isDarkMode ? 'bg-dark text-light' : ''}`}>
+      <div className="row">
+        <div className="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+          <h2 className={`pb-4 mb-4 border-bottom ${isDarkMode ? 'text-light' : ''}`}>
+            Dev.to Technology Articles
+          </h2>
+          
+          {error && (
+            <div className={`alert ${isDarkMode ? 'alert-danger' : 'alert-danger'} text-center`} role="alert">
+              {error}
+            </div>
+          )}
 
-                {error && <div className="alert alert-danger">{error}</div>}
-
-                <button
-                  onClick={fetchNews}
-                  className="btn btn-primary btn-lg btn-expand-sm"
-                  type="button"
-                  disabled={loading}
-                >
-                  {loading ? "Loading..." : "Fetch Headlines"}
-                </button>
-                {articles?.length > 0 && (
-                  <div className="mt-4">
-                    <h5 className="mb-3">Latest News</h5>
-                    <ul className="list-unstyled">
-                      {articles.map((article, index) => (
-                        <li key={index} className="mb-3">
-                          <div className="row g-0 bg-body-muted position-relative">
-                            {/* Image Section */}
-                            {article.urlToImage && (
-                              <div className="col-md-6 mb-md-0 p-md-4">
-                                <img
-                                  src={article.urlToImage}
-                                  className="w-75"
-                                  alt={article.title}
-                                  style={{ objectFit: "cover", height: "auto" }}
-                                />
-                              </div>
-                            )}
-
-                            {/* Text Section */}
-                            <div
-                              className={`col-md-6 p-4 ps-md-0 ${article.urlToImage ? "" : "text-center"}`}
-                            >
-                              <h5 className="mt-0">
-                                <a
-                                  href={article.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="stretched-link"
-                                >
-                                  {article.title}
-                                </a>
-                              </h5>
-                              <p className="text-light">{article.description}</p>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={loadMore}
-                      className="btn btn-secondary"
-                      disabled={loading}
-                    >
-                      {loading ? "Loading More..." : "Load More"}
-                    </button>
-                  </div>
-                )}
-                {articles?.length === 1 && !loading && (
-                  <div className="alert alert-info">No articles found.</div>
-                )}
+          {articles.map((article, index) => (
+            <div 
+              key={article.url} 
+              className={`row mb-5 g-0 border rounded overflow-hidden flex-md-row shadow-lg position-relative ${isDarkMode ? 'bg-secondary text-light' : ''}`}
+              style={{
+                minHeight: '250px',
+                maxHeight: '350px'
+              }}
+            >
+              <div className="col-md-4 d-none d-md-block">
+                <img
+                  src={article.urlToImage}
+                  alt={article.title}
+                  className="img-fluid w-100 h-100"
+                  style={{
+                    objectFit: 'cover',
+                    maxHeight: '350px'
+                  }}
+                  onError={(e) => {
+                    e.target.src = `https://via.placeholder.com/400x250.png?text=Dev.to+Article`;
+                  }}
+                />
+              </div>
+              
+              <div className="col-md-8 p-4 d-flex flex-column">
+                <strong className={`d-inline-block mb-2 ${isDarkMode ? 'text-primary-50' : 'text-primary'}`}>
+                  {article.source.name}
+                </strong>
+                <h3 className={`mb-3 ${isDarkMode ? 'text-light' : ''}`}>{article.title}</h3>
+                <div className={`mb-2 small ${isDarkMode ? 'text-light-50' : 'text-body-secondary'}`}>
+                  {new Date(article.publishedAt).toLocaleDateString()}
+                  {article.author && ` | ${article.author}`}
+                </div>
+                <p className={`card-text mb-3 ${isDarkMode ? 'text-light-50' : 'text-muted'}`}>
+                  {article.description}
+                </p>
+                <div className="mt-auto">
+                  <a 
+                    href={article.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className={`btn ${isDarkMode ? 'btn-outline-light' : 'btn-primary'}`}
+                  >
+                    Continue reading
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
+
+          {hasMoreArticles && (
+            <div className="text-center">
+              <button
+                onClick={loadMore}
+                className={`btn ${isDarkMode ? 'btn-outline-light' : 'btn-outline-primary'} btn-lg`}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Load More Articles"}
+              </button>
+            </div>
+          )}
+
+          {!hasMoreArticles && articles.length > 0 && (
+            <div className={`text-center mt-4 ${isDarkMode ? 'text-light-50' : 'text-muted'}`}>
+              No more articles to load
+            </div>
+          )}
         </div>
       </div>
-    </section>
+    </div>
   );
-};
+}
 
 export default ArticleFetcher;
