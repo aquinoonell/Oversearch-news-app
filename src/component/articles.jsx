@@ -76,7 +76,7 @@ const ArticleFetcher = ({
       <div className="row">
         <div className="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
           <h2 className={`pb-4 mb-4 border-bottom ${isDarkMode ? 'text-light' : ''}`}>
-            Dev.to Technology Articles
+            Technology Articles
           </h2>
           
           {error && (

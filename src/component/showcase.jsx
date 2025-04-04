@@ -88,7 +88,7 @@ function Showcase({ isDarkMode }) {
           <div className="position-sticky" style={{top: '2rem'}}>
             <div className={`p-4 mb-3 ${isDarkMode ? 'bg-secondary text-light' : 'bg-body-tertiary'}`}>
               <h4 className={`fst-italic ${isDarkMode ? 'text-light' : ''}`}>
-                Recent Dev.to Articles
+                Recent Articles
               </h4>
               {featuredArticles.slice(1, 5).map((article, index) => (
                 <div 
