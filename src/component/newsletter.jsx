@@ -38,7 +38,7 @@ const NewsletterForm = ({ isDarkMode }) => {
                                     Stay Informed
                                 </h2>
                                 <p className={`mb-4 ${isDarkMode ? 'text-light-50' : 'text-muted'}`}>
-                                    Subscribe to our newsletter for the latest political insights 
+                                    Subscribe to our newsletter for the latest technology insights 
                                     and news delivered straight to your inbox.
                                 </p>
                                 <form onSubmit={handleSubmit}>
