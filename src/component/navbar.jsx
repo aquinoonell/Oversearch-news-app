@@ -15,17 +15,10 @@ function NavbarMenu() {
       action: () => window.open("https://github.com/aquinoonell", "_blank"),
     },
     {
-      name: "LinkedIn",
-      url: "https://linkedin.com/in/onell-aquino",
-      icon: "linkedin",
-      action: () =>
-        window.open("https://linkedin.com/in/onell-aquino", "_blank"),
-    },
-    {
       name: "Email",
       url: "mailto:oversearch.customerservice@gmail.com",
       icon: "envelope",
-      action: () => (window.location.href = "mailto:oversearh.customerservice@gmail.com"),
+      action: () => (window.location.href = "mailto:oversearch.customerservice@gmail.com"),
     },
   ];
 
