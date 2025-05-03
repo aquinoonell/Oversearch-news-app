@@ -29,7 +29,7 @@ const CatFact = ({ isDarkMode }) => {
           <div className={`card border-0 shadow-sm ${isDarkMode ? 'bg-secondary text-light' : ''}`}>
             <div className="card-body text-center p-5">
               <h2 className={`card-title mb-4 ${isDarkMode ? 'text-light' : ''}`}>
-                Cat Fact of the Moment
+                Cat Fact of the Moment for Ivy 
               </h2>
               
               {isLoading ? (
