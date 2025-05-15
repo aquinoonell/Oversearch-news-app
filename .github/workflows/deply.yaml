@@ -1,19 +1,22 @@
 name: Deploy to AWS CloudFront and Infrastructure
 on:
+  # Add a new event to control automatic deployments
   push:
     branches: [main]
-  # Optionally enable manual triggers with control parameters
+    paths-ignore:
+      - '**/*.tf'  # Ignore Terraform file changes on push
+  # Manual trigger with toggles for both deployments
   workflow_dispatch:
     inputs:
       deploy_infrastructure:
         description: 'Deploy infrastructure changes with Terraform'
         required: true
-        default: 'false'
+        default: false
         type: boolean
       deploy_frontend:
         description: 'Deploy frontend to CloudFront'
         required: true
-        default: 'false'
+        default: false
         type: boolean
 
 jobs:
@@ -47,20 +50,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       
-      # Only run frontend deployment if deploy_frontend is true (default) or not specified
+      # Only run frontend deployment if explicitly triggered from push or workflow_dispatch with frontend toggle
       - name: Deploy to S3
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.deploy_frontend == 'true' }}
+        if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_frontend == 'true') }}
         run: |
           aws s3 sync ./dist/ s3://${{ secrets.S3_BUCKET }} --delete
       
       - name: Create CloudFront invalidation
-        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.deploy_frontend == 'true' }}
+        if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_frontend == 'true') }}
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
 
   terraform-deploy:
     runs-on: ubuntu-latest
-    # Only run if explicitly enabled through workflow_dispatch
+    # Only run if explicitly enabled through workflow_dispatch with infrastructure toggle
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_infrastructure == 'true' }}
     steps:
       - name: Checkout repository
