@@ -1,4 +1,4 @@
 node_modules/
 .env
-terraform.tfvars
-.tfvars.json
+terraform/terraform.tfvars
+terraform/.tfvars.json
