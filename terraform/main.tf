@@ -30,4 +30,23 @@ module "lambda_function" {
   runtime       = "python3.12"
   publish       = true
 
+  store_on_s3 = true
+  s3_bucket   = "my-bucket-id-with-lambda-build"
+
+  layers = [
+    module.lambda_layer_s3.lambda_layer_arn,
+  ]
+
+  environment_varibles = {
+    Serverless = "Terraform"    
+
+  }
+
+  tags = {
+    Module = "lambda-with-layer"
+  }
+
+
 }
+
+
