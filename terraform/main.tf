@@ -49,4 +49,3 @@ module "lambda_function" {
 
 }
 
-
